@@ -57,16 +57,16 @@ def handle_message(event):
     # 画像の中身を取得
     message_content = line_bot_api.get_message_content(message_id)
 
+
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=src_image_path))
+
     #get_message_contentから取れるものが正体不明なので一旦.jpgにして開いてbase64に変換
     # 保存
     with open(src_image_path, "wb") as f:
         for chunk in message_content.iter_content():
             f.write(chunk)
-
-
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="保存完了"))
 
     # 開く
     with open(src_image_path, "rb") as image_file:
