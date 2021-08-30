@@ -50,8 +50,16 @@ def handle_message(event):
     # イベントからメッセージidを取得
     message_id = event.message.id
 
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="message_idを取得"))
+
     # 画像の中身を取得
     message_content = line_bot_api.get_message_content(message_id)
+
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="message_contentを取得"))
 
     #get_message_contentから取れるものが正体不明なので一旦.jpgにして開いてbase64に変換
     # 保存
