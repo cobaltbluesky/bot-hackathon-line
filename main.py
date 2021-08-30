@@ -9,9 +9,6 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, ImageMessage, TextMessage, TextSendMessage
 )
-from pathlib import(
-    Path
-)
 import base64
 import os
 import random
@@ -52,21 +49,20 @@ def handle_message(event):
     message_id = event.message.id
 
     # src_image_pathを生成
-    src_image_path = Path(SRC_IMAGE_PATH.format(message_id)).absolute()
+    src_image_path = SRC_IMAGE_PATH.format(message_id)
 
     # 画像の中身を取得
     message_content = line_bot_api.get_message_content(message_id)
-
-
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=str(src_image_path)))
 
     #get_message_contentから取れるものが正体不明なので一旦.jpgにして開いてbase64に変換
     # 保存
     with open(src_image_path, "wb") as f:
         for chunk in message_content.iter_content():
             f.write(chunk)
+
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="保存完了"))
 
     # 開く
     with open(src_image_path, "rb") as image_file:
