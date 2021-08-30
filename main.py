@@ -47,12 +47,16 @@ def handle_message(event):
         event.reply_token,
         TextSendMessage(text="動作開始"))
 
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="message_idを取得"))
+
     # イベントからメッセージidを取得
     message_id = event.message.id
 
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text="message_idを取得"))
+        TextSendMessage(text="message_id取得完了"))
 
     # 画像の中身を取得
     message_content = line_bot_api.get_message_content(message_id)
@@ -66,9 +70,11 @@ def handle_message(event):
     with open(Path(f"static/images/{message_id}.jpg").absolute(), "wb") as f:
         for chunk in message_content.iter_content():
             f.write(chunk)
+
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text="保存完了"))
+
     # 開く
     with open(f"static/images/{message_id}.jpg", "rb") as image_file:
         # base64に変換
