@@ -60,7 +60,7 @@ def handle_message(event):
 
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=src_image_path))
+        TextSendMessage(text=str(src_image_path)))
 
     #get_message_contentから取れるものが正体不明なので一旦.jpgにして開いてbase64に変換
     # 保存
