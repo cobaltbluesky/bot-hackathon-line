@@ -8,6 +8,8 @@ from linebot.exceptions import (
 )
 from linebot.models import (
     MessageEvent, ImageMessage, TextMessage, TextSendMessage
+)
+import base64
 import os
 import random
 
@@ -40,11 +42,29 @@ def callback():
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_message(event):
-    # 基本的にここにコードを書いていきます。
-    image = event.message.image
+
+    # イベントからメッセージidを取得
+    message_id = event.message.id
+
+    # 画像の中身を取得
+    message_content = line_bot_api.get_message_content(message_id)
+
+    #get_message_contentから取れるものが正体不明なので一旦.jpgにして開いてbase64に変換
+    # 保存
+    with open(Path(f"static/images/{message_id}.jpg").absolute(), "wb") as f:
+        for chunk in message_content.iter_content():
+            f.write(chunk)
+    # 開く
+    with open(f"static/images/{message_id}.jpg", "rb") as image_file:
+        # base64に変換
+        convertedImage = base64.b64encode(image_file.read())
+        # バイナリ型を文字列に変換
+        convertedImage_str = data.decode('utf-8')
+
+    # 返信
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=image))
+        TextSendMessage(text=convertedImage_str))
 
 
 if __name__ == "__main__":
