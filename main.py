@@ -43,6 +43,10 @@ def callback():
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_message(event):
 
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="動作開始"))
+
     # イベントからメッセージidを取得
     message_id = event.message.id
 
@@ -54,6 +58,9 @@ def handle_message(event):
     with open(Path(f"static/images/{message_id}.jpg").absolute(), "wb") as f:
         for chunk in message_content.iter_content():
             f.write(chunk)
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="保存完了"))
     # 開く
     with open(f"static/images/{message_id}.jpg", "rb") as image_file:
         # base64に変換
