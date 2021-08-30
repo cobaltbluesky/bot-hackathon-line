@@ -9,6 +9,9 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, ImageMessage, TextMessage, TextSendMessage
 )
+from pathlib import(
+    Path
+)
 import base64
 import os
 import random
@@ -21,6 +24,8 @@ LINE_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
+
+SRC_IMAGE_PATH = "static/images/{}.jpg"
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -46,21 +51,25 @@ def handle_message(event):
     # イベントからメッセージidを取得
     message_id = event.message.id
 
+    # src_image_pathを生成
+    src_image_path = Path(SRC_IMAGE_PATH.format(message_id)).absolute()
+
     # 画像の中身を取得
     message_content = line_bot_api.get_message_content(message_id)
 
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text = str(message_content)))
-
     #get_message_contentから取れるものが正体不明なので一旦.jpgにして開いてbase64に変換
     # 保存
-    with open(Path(f"static/images/{message_id}.jpg").absolute(), "wb") as f:
+    with open(src_image_path, "wb") as f:
         for chunk in message_content.iter_content():
             f.write(chunk)
 
+
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="保存完了"))
+
     # 開く
-    with open(f"static/images/{message_id}.jpg", "rb") as image_file:
+    with open(src_image_path, "rb") as image_file:
         # base64に変換
         convertedImage = base64.b64encode(image_file.read())
         # バイナリ型を文字列に変換
