@@ -42,21 +42,9 @@ def callback():
 
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_message(event):
-
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="動作開始"))
-
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="message_idを取得"))
-
+    
     # イベントからメッセージidを取得
     message_id = event.message.id
-
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="message_id取得完了"))
 
     # 画像の中身を取得
     message_content = line_bot_api.get_message_content(message_id)
