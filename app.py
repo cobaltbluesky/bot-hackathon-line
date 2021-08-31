@@ -75,10 +75,24 @@ def handle_message(event):
     response = client.label_detection(image=image)
     labels = response.label_annotations
 
+    # カニだったらTrue
+    hantei = 0
+    for label in labels:
+        print(label.description)
+        if label.description == "Crab":
+            hantei = 1
+
+    # hanteiからresultを変える
+    result = "判定できん"
+    if hantei:
+        result = "これはカニです"
+    else:
+        result = "これはカニではない"
+
     # 返信
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=str(labels)))
+        TextSendMessage(text = result))
 
 
 if __name__ == "__main__":
