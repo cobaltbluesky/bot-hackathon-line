@@ -8,7 +8,7 @@
 LineBotもPythonでの開発も初めてでしたが楽しかったです。
 
 ## description
-送られた画像をカニかどうか判別するLINEBot
+送られた画像を機械学習でカニかどうか判別するLINEBot
 
 ## technology
 * Flask
