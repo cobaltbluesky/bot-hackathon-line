@@ -7,14 +7,23 @@ from linebot.models import (
     MessageEvent, ImageMessage, TextMessage, TextSendMessage
 )
 
+# メッセージをjsonに変換するやつ
+from google.protobuf.json_format import MessageToJson
+
+# Imports the Google Cloud client library
+from google.cloud import vision
+
 # 認証情報
 from credentials import *
 
-import base64
 import os
 import random
+import json
 
 app = Flask(__name__)
+
+# Instantiates a client
+client = vision.ImageAnnotatorClient()
 
 # 画像の保存先
 SRC_IMAGE_PATH = "static/images/{}.jpg"
@@ -49,7 +58,7 @@ def handle_message(event):
     # 画像の中身を取得
     message_content = line_bot_api.get_message_content(message_id)
 
-    #get_message_contentから取れるものが正体不明なので一旦.jpgにして開いてbase64に変換
+    #get_message_contentから取れるものが正体不明なので一旦.jpgにして開く
     # 保存
     with open(src_image_path, "wb") as f:
         for chunk in message_content.iter_content():
@@ -57,15 +66,33 @@ def handle_message(event):
 
     # 開く
     with open(src_image_path, "rb") as image_file:
-        # base64に変換
-        convertedImage = base64.b64encode(image_file.read())
-        # バイナリ型を文字列に変換
-        convertedImage_str = data.decode('utf-8')
+        content = image_file.read()
+
+    # 機械学習してるんやろ(適当)
+    image = vision.Image(content=content)
+
+    # Performs label detection on the image file
+    response = client.label_detection(image=image)
+    labels = response.label_annotations
+
+    # カニだったらTrue
+    hantei = 0
+    for label in labels:
+        print(label.description)
+        if label.description == "Crab":
+            hantei = 1
+
+    # hanteiからresultを変える
+    result = "判定できん"
+    if hantei:
+        result = "これはカニです"
+    else:
+        result = "これはカニではない"
 
     # 返信
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=convertedImage_str))
+        TextSendMessage(text = result))
 
 
 if __name__ == "__main__":
